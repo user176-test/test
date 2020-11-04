@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -23,20 +24,21 @@ class UsersControllerTests {
 	void contextLoads() {
 	}
 
+	@Test
 	public void testUserListReturns() {
-		int usersQty = 3;
-		List<User> users = IntStream.range(1, usersQty).mapToObj(i -> new User(i, "UserName" + i)).collect(Collectors.toList());
+		List<User> users = IntStream.range(1, 4).mapToObj(i -> new User(i, "UserName" + i)).collect(Collectors.toList());
 		Mockito.doReturn(users).when(userRepository).getUsers();
 
 		List<User> userList =  usersController.list();
-		Assert.isTrue(userList.size() == usersQty, "list size is wrong");
+		Assert.isTrue(userList.size() == 3, "list size is wrong");
 
 		Mockito.verify(userRepository).getUsers();
 	}
 
+	@Test
 	public void testUserGetByIdReturns() {
 		User user = new User(1, "UserName" + 1);
-		Mockito.doReturn(user).when(userRepository).findById(ArgumentMatchers.any());
+		Mockito.doReturn(Optional.of(user)).when(userRepository).findById(ArgumentMatchers.anyLong());
 
 		User userDetail =  usersController.get(user.getId());
 		Assert.isTrue(userDetail.getId() == user.getId(), "invalid user");
